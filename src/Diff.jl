@@ -21,8 +21,8 @@ module Diff
         
         # Check which index is faster to iterate over.
         # wether we are fortran or c-like
-        for i1 in 1:m
-            for i2 in 1:n
+        for i2 in 1:n
+            for i1 in 1:m
                 if s1[i1] == s2[i2]
                     edit_distances[i1+1,i2+1] = edit_distances[i1,i2]+1
                 else
