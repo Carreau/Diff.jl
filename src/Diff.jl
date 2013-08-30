@@ -15,22 +15,22 @@ module Diff
         m::Int = length(s1)
         n::Int = length(s2)
             
-        edit_distances = Array(Int,(m+1,n+1))
-        edit_distances[1,:] = 0
-        edit_distances[:,1] = 0
+        lcs_lengths = Array(Int,(m+1,n+1))
+        lcs_lengths[1,:] = 0
+        lcs_lengths[:,1] = 0
         
         # Check which index is faster to iterate over.
         # wether we are fortran or c-like
         for i2 in 1:n
             for i1 in 1:m
                 if s1[i1] == s2[i2]
-                    edit_distances[i1+1,i2+1] = edit_distances[i1,i2]+1
+                    lcs_lengths[i1+1,i2+1] = lcs_lengths[i1,i2]+1
                 else
-                    edit_distances[i1+1,i2+1] = max(edit_distances[i1,i2+1], edit_distances[i1+1,i2])
+                    lcs_lengths[i1+1,i2+1] = max(lcs_lengths[i1,i2+1], lcs_lengths[i1+1,i2])
                 end
             end
         end
-        return edit_distances
+        return lcs_lengths
     end
     
     # Compute the Edit Distance of 2 sequeces s1 and s2
@@ -38,7 +38,7 @@ module Diff
     # but can be a more eficient algorythme using O(min(len(s1), len(s2)))
     # in memory if one is not interested in knowign the sequnce, but just its
     # length
-    function edit_distance(s1,s2)
+    function lcs_length(s1,s2)
         return lcs_matrix(s1,s2)[end,end]
     end
     
@@ -88,27 +88,31 @@ module Diff
             m, n =  n, m
             s1, s2 = s2, s1
         end
-        edit_distances = Array(Int,(n+1))
-        edit_distances[:] = 0
-        ci = 0
+        lcs_lengths = Array(Int,(m+1))
+        lcs_lengths[:] = 0
+
+        ind = x::Int -> mod(x-1, m+1)+1
+        ci::Int = 0
+
         for i2 in 1:n
+            c2 =  s2[i2] 
             for i1 in 1:m
                 ci +=1
-                if s1[i1] == s2[i2]
+                if s1[i1] == c2
                     if(i1==1)
-                        edit_distances[mod(ci,n+1)+1] = 1
+                        lcs_lengths[ind(ci)] = 1
                     else
-                        edit_distances[mod(ci,n+1)+1] += 1
+                        lcs_lengths[ind(ci)] += 1
                     end
                 else
-                    if (i1==1)
-                        edit_distances[mod(ci,n+1)+1] = edit_distances[mod(ci,n+1)+1]
+                    if (i1 != 1)
+                        lcs_lengths[ind(ci)] = max(lcs_lengths[ind(ci-1)], lcs_lengths[ind(ci+1)])
                     else
-                        edit_distances[mod(ci,n+1)+1] = max(edit_distances[mod(ci-1,n+1)+1], edit_distances[mod(ci,n)+1])
+                        lcs_lengths[ind(ci)] = lcs_lengths[ind(ci+1)]
                     end
                 end
             end
         end
-        return edit_distances[end]
+        return lcs_lengths[ind(ci)]
     end
 end
