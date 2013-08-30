@@ -12,7 +12,7 @@ if test_type == "ALL" || test_type == "TEST" || test_type == "INSTALL"
 end
 
 if test_type == "ALL" || test_type == "PERF"
-  x = ''
+  x = 0
   @time for rep = 1:70
     s1l = repeat(s1,rep)
     s2l = repeat(s2,rep)
