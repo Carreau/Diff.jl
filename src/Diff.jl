@@ -75,4 +75,40 @@ module Diff
         return join(backtrack(C,s1,s2))
     end
     
+    # return a lcs edit distance between
+    # the 2 sequences by using as low memeory as possible.
+    # mainly by storing only previous row of current lcs matrice + 1 element
+    # but for whichever reason this is much slower than
+    # edit_distance. but have a O(m+n) memory footprint, where
+    # edit_distance have a O(m*n) footprint.
+    function lcs_distance_low_m(s1,s2)
+        m::Int = length(s1)
+        n::Int = length(s2)
+        if n < m
+            m, n =  n, m
+            s1, s2 = s2, s1
+        end
+        edit_distances = Array(Int,(n+1))
+        edit_distances[:] = 0
+        ci = 0
+        for i2 in 1:n
+            for i1 in 1:m
+                ci +=1
+                if s1[i1] == s2[i2]
+                    if(i1==1)
+                        edit_distances[mod(ci,n+1)+1] = 1
+                    else
+                        edit_distances[mod(ci,n+1)+1] += 1
+                    end
+                else
+                    if (i1==1)
+                        edit_distances[mod(ci,n+1)+1] = edit_distances[mod(ci,n+1)+1]
+                    else
+                        edit_distances[mod(ci,n+1)+1] = max(edit_distances[mod(ci-1,n+1)+1], edit_distances[mod(ci,n)+1])
+                    end
+                end
+            end
+        end
+        return edit_distances[end]
+    end
 end
