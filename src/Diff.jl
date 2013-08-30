@@ -90,16 +90,16 @@ module Diff
         end
         ## c = current , p = previous
         lcs_lengthsc = Array(Int,(m))
-        lcs_lengthsc[:] = 0
         lcs_lengthsp = Array(Int,(m))
+        lcs_lengthsc[:] = 0
         lcs_lengthsp[:] = 0
 
-
-        ci::Int = 0
+        cc = ' '
         for i2 in 1:n
+            cc = s2[i2]
             lcs_lengthsc , lcs_lengthsp = lcs_lengthsp, lcs_lengthsc
             for i1 in 1:m
-                if s1[i1] == s2[i2]
+                if s1[i1] == cc
                     if(i1==1)
                         lcs_lengthsc[1] = 1
                     else
@@ -111,7 +111,7 @@ module Diff
                         b = lcs_lengthsc[i1-1]
                         lcs_lengthsc[i1] = max(a,b)
                     else
-                        lcs_lengthsc[i1] = lcs_lengthsp[i1]
+                        lcs_lengthsc[1] = lcs_lengthsp[1]
                     end
                 end
             end
