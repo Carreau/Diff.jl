@@ -11,3 +11,4 @@ before_install:
 script:
   - julia -e 'Pkg.init(); run(`ln -s $(pwd()) $(Pkg.dir())/`); Pkg.resolve()'
   - julia -e 'using Diff; @assert isdefined(:Diff); @assert typeof(Diff) === Module'
+  - julia test/runtests.jl TEST
