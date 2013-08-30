@@ -88,31 +88,34 @@ module Diff
             m, n =  n, m
             s1, s2 = s2, s1
         end
-        lcs_lengths = Array(Int,(m+1))
-        lcs_lengths[:] = 0
+        ## c = current , p = previous
+        lcs_lengthsc = Array(Int,(m))
+        lcs_lengthsc[:] = 0
+        lcs_lengthsp = Array(Int,(m))
+        lcs_lengthsp[:] = 0
 
-        ind = x::Int -> mod(x-1, m+1)+1
+
         ci::Int = 0
-
         for i2 in 1:n
-            c2 =  s2[i2] 
+            lcs_lengthsc , lcs_lengthsp = lcs_lengthsp, lcs_lengthsc
             for i1 in 1:m
-                ci +=1
-                if s1[i1] == c2
+                if s1[i1] == s2[i2]
                     if(i1==1)
-                        lcs_lengths[ind(ci)] = 1
+                        lcs_lengthsc[1] = 1
                     else
-                        lcs_lengths[ind(ci)] += 1
+                        lcs_lengthsc[i1] = lcs_lengthsp[i1-1]+1
                     end
                 else
                     if (i1 != 1)
-                        lcs_lengths[ind(ci)] = max(lcs_lengths[ind(ci-1)], lcs_lengths[ind(ci+1)])
+                        a = lcs_lengthsp[i1]
+                        b = lcs_lengthsc[i1-1]
+                        lcs_lengthsc[i1] = max(a,b)
                     else
-                        lcs_lengths[ind(ci)] = lcs_lengths[ind(ci+1)]
+                        lcs_lengthsc[i1] = lcs_lengthsp[i1]
                     end
                 end
             end
         end
-        return lcs_lengths[ind(ci)]
+        return lcs_lengthsc[end]
     end
 end
