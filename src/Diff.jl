@@ -10,8 +10,7 @@ module Diff
     # This is not the more efficient way (memory speeking)
     # of computing a LCS edit distance, but can bu used to back track the
     # changes to get the lcs sequences afterward.
-    function lcs_matrix(s1,s2)
-    
+    function lcs_matrix{T}(s1::Vector{T},s2::Vector{T})
         m::Int = length(s1)
         n::Int = length(s2)
             
@@ -44,10 +43,13 @@ module Diff
     
     ## private, backtrack the LCS matrix to find **one**
     ## of the LCS.
-    function _backtrack(C, X, Y, i::Int, j::Int)
+    function _backtrack{T}(C :: Array{Int, 2},
+			   X :: Vector{T},
+			   Y :: Vector{T},
+			   i :: Int, j :: Int)
         if (i == 1) || (j == 1)
             ## Ugly typing, sure we can be smarter in function definition by typing X and Y
-            return typeof(X[1])[]
+            return T[]
         elseif  ( X[i-1] == Y[j-1] )
             return append!(_backtrack(C, X, Y, i-1, j-1), [X[i-1]])
         else
@@ -64,14 +66,15 @@ module Diff
         return _backtrack(C, X, Y, length(X)+1, length(Y)+1)
     end
     
-    function one_of_the_lcs(s1::Any,s2::Any)
+    function one_of_the_lcs{T}(s1::Vector{T},s2::Vector{T})
         C = lcs_matrix(s1,s2)
         return backtrack(C,s1,s2)
     end
     
-    ## special case dispatch on string to re-join them
     function one_of_the_lcs(s1::String, s2::String)
-        C = lcs_matrix(s1,s2)
+        s1 = [s for s=s1]
+        s2 = [s for s=s2]
+        C = lcs_matrix(s1, s2)
         return join(backtrack(C,s1,s2))
     end
     
